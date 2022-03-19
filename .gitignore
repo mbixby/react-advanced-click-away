@@ -1,0 +1,15 @@
+build
+.cache
+dist
+node_modules
+.rpt2_cache
+.vscode
+docs
+docs/*
+
+# testing
+coverage
+
+# OS stuff
+._*
+.DS_Store

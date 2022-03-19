@@ -1,0 +1,27 @@
+body,
+button {
+  font-family: system-ui, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+}
+
+button {
+  border: 0;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+button:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+button:active,
+button:focus-visible {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+code {
+  font-family: ui-monospace, Menlo, Monaco, "Roboto Mono", "Oxygen Mono",
+    "Ubuntu Monospace", "Source Code Pro", "Droid Sans Mono", "Courier New",
+    monospace !important;
+}

@@ -1,0 +1,27 @@
+import { Meta } from "@storybook/addon-docs";
+import StoryAndSource from "./components/StoryAndSource";
+import ClickAwayListener from "../ClickAwayListener";
+
+<Meta title="Nesting" />
+
+# Nesting
+
+`ClickAwayListener` works when nested in a DOM tree or a React tree, including inside portals.
+
+In the example below we're nesting two layers (two click away listeners).
+
+- clicking outside of both layered `<ClickAwayListener>` elements will trigger the `onClickAway` callbacks of both layers
+- clicking inside the second layer will do nothing
+- clicking inside the first layer, but outside of the second layer, will only trigger the `onClickAway` of the second layer
+
+<StoryAndSource id="stories-nesting--scenario-1" />
+
+## Portals
+
+When `<ClickAwayListener>` elements are nested inside React Portals, they work the same way as if they weren't.
+
+Even though the elements are not nested in DOM, they are nested in the React tree. Internally, we determine that the second layer is "inside" the first layer by checking whether React events propagate from the layer below and by looking at the React Context hiearchy established by the `<ClickAwayListener>` elements.
+
+This behaviour can be disabled using the `disableReactTree` prop, which means that the listener will only DOM hierarchy will be considered.
+
+<StoryAndSource id="stories-nesting--scenario-2" />

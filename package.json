@@ -1,0 +1,148 @@
+{
+  "name": "react-advanced-click-away",
+  "version": "0.0.0-development",
+  "description": "A worry-free click away listener for advanced use cases.",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "scripts": {
+    "build": "rollup -c",
+    "test": "jest",
+    "lint": "eslint src --ext .ts,.tsx,.js,.jsx --cache --max-warnings 0",
+    "coverage": "npm run test -- --coverage",
+    "cleanup": "rimraf dist",
+    "release": "standard-version",
+    "prettier": "prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
+    "storybook": "start-storybook -p 6006",
+    "build:storybook": "del ./storybook-static; NODE_ENV=production build-storybook"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "click away",
+    "click outside",
+    "react"
+  ],
+  "author": "Michal Obrocnik <roomy_western_0x@icloud.com>",
+  "homepage": "https://mbixby.github.io/react-advanced-click-away/",
+  "repository": {
+    "url": "https://github.com/mbixby/react-advanced-click-away"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.17.7",
+    "@babel/preset-typescript": "^7.16.7",
+    "@rollup/plugin-commonjs": "^21.0.2",
+    "@rollup/plugin-node-resolve": "^13.1.3",
+    "@rollup/plugin-typescript": "^8.3.1",
+    "@storybook/addon-actions": "^6.4.19",
+    "@storybook/addon-essentials": "^6.4.19",
+    "@storybook/addon-interactions": "^6.4.19",
+    "@storybook/addon-links": "^6.4.19",
+    "@storybook/builder-webpack5": "^6.4.19",
+    "@storybook/manager-webpack5": "^6.4.19",
+    "@storybook/react": "^6.4.19",
+    "@storybook/testing-library": "^0.0.9",
+    "@testing-library/jest-dom": "^5.16.2",
+    "@testing-library/react": "^12.1.4",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/chroma-js": "^2.1.3",
+    "@types/jest": "^27.4.1",
+    "@types/lodash": "^4.14.180",
+    "@types/react": "^17.0.40",
+    "@types/shallowequal": "^1.1.1",
+    "@typescript-eslint/eslint-plugin": "^5.16.0",
+    "@typescript-eslint/parser": "^5.16.0",
+    "babel-loader": "^8.2.3",
+    "chroma-js": "^2.4.2",
+    "classnames": "^2.3.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^8.11.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-babel": "^5.0.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.5.1",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "jest": "^27.5.1",
+    "lodash": "^4.17.21",
+    "mapped-replace": "^1.0.3",
+    "react-docgen-typescript": "^2.2.2",
+    "react-icons": "^4.3.1",
+    "react-popper": "^2.2.5",
+    "rollup": "^2.70.1",
+    "rollup-plugin-dts": "^4.2.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-terser": "^7.0.2",
+    "shallowequal": "^1.1.0",
+    "standard-version": "^9.3.2",
+    "ts-jest": "^27.1.3",
+    "typescript": "^4.6.2",
+    "webpack": "^5.70.0"
+  },
+  "peerDependencies": {
+    "react": "^16.14.0 || ^17.0.2",
+    "react-dom": "^16.14.0 || ^17.0.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "eslintConfig": {
+    "root": true,
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "sourceType": "module"
+    },
+    "plugins": [
+      "@typescript-eslint",
+      "react",
+      "react-hooks"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:react/recommended",
+      "plugin:react-hooks/recommended"
+    ],
+    "rules": {
+      "react/display-name": [
+        "off"
+      ],
+      "@typescript-eslint/no-explicit-any": [
+        "off"
+      ],
+      "@typescript-eslint/no-non-null-assertion": [
+        "off"
+      ],
+      "@typescript-eslint/no-unnecessary-type-constraint": [
+        "off"
+      ],
+      "@typescript-eslint/prefer-as-const": [
+        "off"
+      ],
+      "@typescript-eslint/ban-ts-comment": [
+        "off"
+      ],
+      "@typescript-eslint/no-empty-function": [
+        "off"
+      ],
+      "react/no-unescaped-entities": [
+        "off"
+      ]
+    }
+  },
+  "dependencies": {
+    "fast-deep-equal": "^3.1.3"
+  }
+}
