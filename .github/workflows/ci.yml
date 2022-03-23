@@ -16,11 +16,10 @@ jobs:
           node-version: 16
       - run: npm ci
       - run: npm run lint
-      - run: npm test
+      - run: npm run test:coverage
       - name: Collect coverage
         uses: codecov/codecov-action@v2
         if: success()
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           fail_ci_if_error: true
