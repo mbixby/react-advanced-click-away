@@ -2,8 +2,9 @@
 
 > A worry-free click away listener for advanced use cases.
 
-[![NPM](https://img.shields.io/npm/v/react-advanced-clickaway.svg)](https://www.npmjs.com/package/react-advanced-click-away)
-[![Build](https://img.shields.io/github/checks-status/mbixby/react-advanced-click-away/main)](https://github.com/github/docs/actions/workflows/ci.yml/badge.svg?branch=main)
+[![NPM](https://img.shields.io/npm/v/react-advanced-click-away)](https://www.npmjs.com/package/react-advanced-click-away)
+[![CI](https://img.shields.io/github/workflow/status/mbixby/react-advanced-click-away/CI)](https://github.com/mbixby/react-advanced-click-away/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/mbixby/react-advanced-click-away.svg)](https://codecov.io/gh/mbixby/react-advanced-click-away/branch/main)
 
 ## Installation
 
@@ -36,7 +37,7 @@ The original version of this component is adapted from [Material UI's ClickAwayL
 
 This library however aims to support some advanced cases when nesting multiple `<ClickAwayListener>` components, which is useful when building nested popovers, menus and modals. Most notably, this `<ClickAwayListener>` can recognise its descendant elements as its content even when the elements stop mouse event propagation to the document.
 
-Check out the [docs and demos]() to see everything in action.
+Check out the [docs and demos](https://mbixby.github.io/react-advanced-click-away) to see everything in action.
 
 ## Props
 
