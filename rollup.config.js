@@ -1,8 +1,9 @@
-import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
-import typescript from "@rollup/plugin-typescript";
+import resolve from "@rollup/plugin-node-resolve";
 import dts from "rollup-plugin-dts";
 import peerDepsExternal from "rollup-plugin-peer-deps-external";
+import sourceMaps from "rollup-plugin-sourcemaps";
+import typescript from "rollup-plugin-typescript2";
 
 const packageJson = require("./package.json");
 
@@ -25,14 +26,18 @@ export default [
     ],
     plugins: [
       peerDepsExternal(),
-      resolve(),
+      typescript({ useTsconfigDeclarationDir: true, inlineSources: true }),
       commonjs(),
-      typescript({ tsconfig: "./tsconfig.json" }),
+      resolve(),
+      sourceMaps(),
     ],
     external: ["react", "react-dom"],
+    watch: {
+      include: "src/**",
+    },
   },
   {
-    input: "dist/esm/types/index.d.ts",
+    input: "dist/types/index.d.ts",
     output: [{ file: "dist/index.d.ts", format: "esm" }],
     plugins: [dts()],
   },
