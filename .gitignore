@@ -6,6 +6,7 @@ node_modules
 .vscode
 docs
 docs/*
+.eslintcache
 
 # testing
 coverage
