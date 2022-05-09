@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.2](https://github.com/mbixby/react-advanced-click-away/compare/v2.1.1...v2.1.2) (2022-05-09)
+
+
+### Bug Fixes
+
+* allow passing null as child to StopPropagation ([1cd024a](https://github.com/mbixby/react-advanced-click-away/commit/1cd024a325bf0bc94983f62ab5bcce305aebfa51))
+
 ### [2.1.1](https://github.com/mbixby/react-advanced-click-away/compare/v2.1.0...v2.1.1) (2022-05-09)
 
 

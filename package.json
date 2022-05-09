@@ -1,6 +1,6 @@
 {
   "name": "react-advanced-click-away",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "A worry-free click away listener for advanced use cases.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
