@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.4](https://github.com/mbixby/react-advanced-click-away/compare/v2.1.3...v2.1.4) (2022-05-09)
+
+
+### Bug Fixes
+
+* remove erroneous usage of composedPath ([dd4a3a6](https://github.com/mbixby/react-advanced-click-away/commit/dd4a3a61fad8cf50dca060da17ea2073f15319bf))
+
 ### [2.1.3](https://github.com/mbixby/react-advanced-click-away/compare/v2.1.2...v2.1.3) (2022-05-09)
 
 
