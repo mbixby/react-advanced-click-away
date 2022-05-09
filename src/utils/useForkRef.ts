@@ -26,7 +26,7 @@ export function setReactRef<T>(ref: MutableRef<T>, value: T): void {
  * Adapted from material-ui/blob/master/packages/material-ui/src/utils/useForkRef.js
  */
 export function useForkRef<T>(
-  ref1: MutableRef<T>,
+  ref1: MutableRef<T> | undefined,
   ref2: MutableRef<T> | undefined
 ): RefCallback<T> {
   return useMemo(() => {
@@ -34,7 +34,9 @@ export function useForkRef<T>(
       return noop;
     }
     return (refValue) => {
-      setReactRef(ref1, refValue);
+      if (ref1) {
+        setReactRef(ref1, refValue);
+      }
       if (ref2) {
         setReactRef(ref2, refValue);
       }

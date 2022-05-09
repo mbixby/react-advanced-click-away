@@ -20,7 +20,7 @@ export interface Props {
   /**
    * A single element that accepts event handlers
    */
-  children: ReactElement;
+  children?: ReactElement;
   /**
    * Stop mouse, touch, drag and keyboard events
    */
@@ -65,13 +65,12 @@ const StopPropagation = forwardRef<HTMLElement, Props>(
     }
     const combinedRef = useForkRef(
       // @ts-expect-error
-      children.ref,
+      children?.ref,
       parentRef
     );
 
     const handleEvent = useCallback(
       (event: React.MouseEvent) => {
-        console.log("stopping", event.type);
         event.stopPropagation();
 
         if (!excludeNativeEvents) {
@@ -89,7 +88,7 @@ const StopPropagation = forwardRef<HTMLElement, Props>(
             // order.
             // eslint-disable-next-line react-hooks/rules-of-hooks
             const combinedHandler = useCombinedHandler(
-              children.props[eventName],
+              children?.props[eventName],
               handleEvent
             );
             return [eventName, combinedHandler];
@@ -99,6 +98,9 @@ const StopPropagation = forwardRef<HTMLElement, Props>(
       })
     );
 
+    if (!children) {
+      return null;
+    }
     return cloneElement(children, {
       ref: combinedRef,
       ...(all || mouse ? handlers.mouse : null),
