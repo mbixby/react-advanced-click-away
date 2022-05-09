@@ -4,10 +4,9 @@ import {
   screen,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import React, { useContext, useRef } from "react";
+import React, { forwardRef, useRef } from "react";
 import ReactDOM from "react-dom";
-import ClickAwayListener from "../ClickAwayListener";
-import { ClickAwayContext } from "../context";
+import ClickAwayListener from "./ClickAwayListener";
 
 const render = async (element: React.ReactElement) => {
   const result = await originalRender(element);
@@ -23,14 +22,12 @@ const Portal: React.FC<{
   stopEventPropagation?: boolean;
 }> = ({ children, stopEventPropagation }) => {
   const ref = useRef<HTMLDivElement | null>(null);
-  const clickAwayContext = useContext(ClickAwayContext);
   if (!stopEventPropagation) {
     return ReactDOM.createPortal(children, document.body);
   }
   const handleEvent = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
     event.preventDefault();
-    clickAwayContext?.propagateEvent(event);
   };
   return (
     <div
@@ -194,7 +191,9 @@ describe("ClickAwayListener", () => {
                     <ClickAwayListener onClickAway={() => setOpen(false)}>
                       <div data-testid="child" />
                     </ClickAwayListener>,
-                    // Needs to be an element between the react root we render into and the element where CAL attaches its native listener (now: `document`).
+                    // Needs to be an element between the react root we render into and
+                    // the element where CAL attaches its native listener (now:
+                    // `document`).
                     document.body
                   )}
               </React.Fragment>
@@ -303,247 +302,219 @@ describe("ClickAwayListener", () => {
         expect(handleClickAway).toHaveBeenCalledTimes(0);
         button!.removeEventListener("mouseup", restrictiveHandler);
       });
+    });
 
-      it("should be called if prop.useCapture is true", async () => {
+    describe("prop: mouseEvent", () => {
+      it("should not call `props.onClickAway` when `props.mouseEvent` is `false`", async () => {
         const handleClickAway = jest.fn();
-        const restrictiveHandler = (event: any) =>
-          event.stopImmediatePropagation();
-        let button: HTMLButtonElement | null;
-        const { getByText } = await render(
-          <>
-            <ClickAwayListener onClickAway={handleClickAway} useCapture>
-              <div />
-            </ClickAwayListener>
-            <button
-              ref={(element) => {
-                button = element;
-              }}
-            >
-              Outside
-            </button>
-          </>
+        await render(
+          <ClickAwayListener onClickAway={handleClickAway} mouseEvent={false}>
+            <span />
+          </ClickAwayListener>
         );
-        button!.addEventListener("mouseup", restrictiveHandler);
-        fireEvent.mouseUp(getByText("Outside"));
-        await Promise.resolve();
+        await userEvent.click(document.body);
+        expect(handleClickAway).toHaveBeenCalledTimes(0);
+      });
+
+      it("should call `props.onClickAway` when the appropriate mouse event is triggered", async () => {
+        const handleClickAway = jest.fn();
+        await render(
+          <ClickAwayListener
+            onClickAway={handleClickAway}
+            mouseEvent="mousedown"
+          >
+            <span />
+          </ClickAwayListener>
+        );
+        fireEvent.mouseUp(document.body);
+        expect(handleClickAway).toHaveBeenCalledTimes(0);
+        fireEvent.mouseDown(document.body);
         expect(handleClickAway).toHaveBeenCalledTimes(1);
-        button!.removeEventListener("mouseup", restrictiveHandler);
+        expect(handleClickAway.mock.calls[0].length).toEqual(1);
       });
     });
-  });
 
-  describe("prop: mouseEvent", () => {
-    it("should not call `props.onClickAway` when `props.mouseEvent` is `false`", async () => {
+    describe("prop: touchEvent", () => {
+      it("should not call `props.onClickAway` when `props.touchEvent` is `false`", async () => {
+        const handleClickAway = jest.fn();
+        await render(
+          <ClickAwayListener onClickAway={handleClickAway} touchEvent={false}>
+            <span />
+          </ClickAwayListener>
+        );
+        fireEvent.touchEnd(document.body);
+        expect(handleClickAway).toHaveBeenCalledTimes(0);
+      });
+
+      it("should call `props.onClickAway` when the appropriate touch event is triggered", async () => {
+        const handleClickAway = jest.fn();
+        await render(
+          <ClickAwayListener
+            onClickAway={handleClickAway}
+            touchEvent="touchstart"
+          >
+            <span />
+          </ClickAwayListener>
+        );
+        fireEvent.touchEnd(document.body);
+        expect(handleClickAway).toHaveBeenCalledTimes(0);
+        fireEvent.touchStart(document.body);
+        expect(handleClickAway).toHaveBeenCalledTimes(1);
+        expect(handleClickAway.mock.calls[0].length).toEqual(1);
+      });
+
+      it("should ignore `touchend` when preceded by `touchmove` event", async () => {
+        const handleClickAway = jest.fn();
+        await render(
+          <ClickAwayListener
+            onClickAway={handleClickAway}
+            touchEvent="touchend"
+          >
+            <span />
+          </ClickAwayListener>
+        );
+
+        fireEvent.touchStart(document.body);
+        fireEvent.touchMove(document.body);
+        fireEvent.touchEnd(document.body);
+        expect(handleClickAway).toHaveBeenCalledTimes(0);
+
+        fireEvent.touchEnd(document.body);
+        expect(handleClickAway).toHaveBeenCalledTimes(1);
+        expect(handleClickAway.mock.calls[0].length).toEqual(1);
+      });
+    });
+
+    it("should handle null child", async () => {
+      const Child = forwardRef(() => null);
       const handleClickAway = jest.fn();
       await render(
-        <ClickAwayListener onClickAway={handleClickAway} mouseEvent={false}>
-          <span />
+        <ClickAwayListener onClickAway={handleClickAway}>
+          <Child />
         </ClickAwayListener>
       );
       await userEvent.click(document.body);
       expect(handleClickAway).toHaveBeenCalledTimes(0);
     });
 
-    it("should call `props.onClickAway` when the appropriate mouse event is triggered", async () => {
-      const handleClickAway = jest.fn();
-      await render(
-        <ClickAwayListener
-          onClickAway={handleClickAway}
-          mouseEvent="onMouseDown"
-        >
-          <span />
-        </ClickAwayListener>
-      );
-      fireEvent.mouseUp(document.body);
-      expect(handleClickAway).toHaveBeenCalledTimes(0);
-      fireEvent.mouseDown(document.body);
-      expect(handleClickAway).toHaveBeenCalledTimes(1);
-      expect(handleClickAway.mock.calls[0].length).toEqual(1);
-    });
-  });
+    describe.each([
+      [false, "onClick"],
+      [true, "onClick"],
+    ])(`when 'disableReactTree=%s' then %s`, (disableReactTree, eventName) => {
+      it("triggers onClickAway if an outside target is removed", async () => {
+        if (!new Event("click").composedPath) {
+          throw new Error();
+        }
 
-  describe("prop: touchEvent", () => {
-    it("should not call `props.onClickAway` when `props.touchEvent` is `false`", async () => {
-      const handleClickAway = jest.fn();
-      await render(
-        <ClickAwayListener onClickAway={handleClickAway} touchEvent={false}>
-          <span />
-        </ClickAwayListener>
-      );
-      fireEvent.touchEnd(document.body);
-      expect(handleClickAway).toHaveBeenCalledTimes(0);
-    });
+        const handleClickAway = jest.fn();
+        function Test() {
+          const [buttonShown, hideButton] = React.useReducer(() => false, true);
 
-    it("should call `props.onClickAway` when the appropriate touch event is triggered", async () => {
-      const handleClickAway = jest.fn();
-      await render(
-        <ClickAwayListener
-          onClickAway={handleClickAway}
-          touchEvent="onTouchStart"
-        >
-          <span />
-        </ClickAwayListener>
-      );
-      fireEvent.touchEnd(document.body);
-      expect(handleClickAway).toHaveBeenCalledTimes(0);
-      fireEvent.touchStart(document.body);
-      expect(handleClickAway).toHaveBeenCalledTimes(1);
-      expect(handleClickAway.mock.calls[0].length).toEqual(1);
-    });
+          return (
+            <React.Fragment>
+              {buttonShown && (
+                <button {...{ [eventName]: hideButton }} type="button" />
+              )}
+              <ClickAwayListener
+                onClickAway={handleClickAway}
+                disableReactTree={disableReactTree}
+              >
+                <div />
+              </ClickAwayListener>
+            </React.Fragment>
+          );
+        }
+        await render(<Test />);
+        await userEvent.click(screen.getByRole("button"));
 
-    it("should ignore `touchend` when preceded by `touchmove` event", async () => {
-      const handleClickAway = jest.fn();
-      await render(
-        <ClickAwayListener
-          onClickAway={handleClickAway}
-          touchEvent="onTouchEnd"
-        >
-          <span />
-        </ClickAwayListener>
-      );
+        expect(handleClickAway).toHaveBeenCalledTimes(1);
+      });
 
-      fireEvent.touchStart(document.body);
-      fireEvent.touchMove(document.body);
-      fireEvent.touchEnd(document.body);
-      expect(handleClickAway).toHaveBeenCalledTimes(0);
+      it("does not trigger onClickAway if an inside async target is removed", async () => {
+        if (!new Event("click").composedPath) {
+          return;
+        }
 
-      fireEvent.touchEnd(document.body);
-      expect(handleClickAway).toHaveBeenCalledTimes(1);
-      expect(handleClickAway.mock.calls[0].length).toEqual(1);
-    });
-  });
+        const handleClickAway = jest.fn();
 
-  it("should handle null child", async () => {
-    const Child = React.forwardRef(() => null);
-    const handleClickAway = jest.fn();
-    await render(
-      <ClickAwayListener onClickAway={handleClickAway}>
-        <Child />
-      </ClickAwayListener>
-    );
-    await userEvent.click(document.body);
-    expect(handleClickAway).toHaveBeenCalledTimes(0);
-  });
+        function Test() {
+          const [buttonShown, hideButton] = React.useReducer(() => false, true);
 
-  describe.each([
-    [false, "onClick"],
-    // [true, 'onClick'],
-    // [false, 'onClickCapture'],
-    // [true, 'onClickCapture'],
-  ])(`when 'disableReactTree=%s' then %s`, (disableReactTree, eventName) => {
-    it("triggers onClickAway if an outside target is removed", async () => {
-      if (!new Event("click").composedPath) {
-        throw new Error();
-      }
-
-      const handleClickAway = jest.fn();
-      function Test() {
-        const [buttonShown, hideButton] = React.useReducer(() => false, true);
-
-        return (
-          <React.Fragment>
-            {buttonShown && (
-              <button {...{ [eventName]: hideButton }} type="button" />
-            )}
+          return (
             <ClickAwayListener
               onClickAway={handleClickAway}
               disableReactTree={disableReactTree}
             >
-              <div />
+              <div>
+                {buttonShown && (
+                  <button {...{ [eventName]: hideButton }} type="button" />
+                )}
+              </div>
             </ClickAwayListener>
-          </React.Fragment>
+          );
+        }
+        await render(<Test />);
+        await userEvent.click(screen.getByRole("button"));
+
+        expect(handleClickAway).toHaveBeenCalledTimes(0);
+      });
+    });
+
+    describe("nesting", () => {
+      it("should call all prop.onClickAway handlers when clicking outside of both elements", async () => {
+        const handleOuterClickAway = jest.fn();
+        const handleInnerClickAway = jest.fn();
+        await render(
+          <>
+            <ClickAwayListener onClickAway={handleOuterClickAway}>
+              <div>
+                <ClickAwayListener onClickAway={handleInnerClickAway}>
+                  <div />
+                </ClickAwayListener>
+              </div>
+            </ClickAwayListener>
+            <button>Outside</button>
+          </>
         );
-      }
-      await render(<Test />);
-      await userEvent.click(screen.getByRole("button"));
+        await userEvent.click(screen.getByRole("button"));
+        expect(handleOuterClickAway).toHaveBeenCalledTimes(1);
+        expect(handleInnerClickAway).toHaveBeenCalledTimes(1);
+      });
 
-      expect(handleClickAway).toHaveBeenCalledTimes(1);
-    });
-
-    it("does not trigger onClickAway if an inside async target is removed", async () => {
-      if (!new Event("click").composedPath) {
-        return;
-      }
-
-      const handleClickAway = jest.fn();
-
-      function Test() {
-        const [buttonShown, hideButton] = React.useReducer(() => false, true);
-
-        return (
-          <ClickAwayListener
-            onClickAway={handleClickAway}
-            disableReactTree={disableReactTree}
-          >
-            <div>
-              {buttonShown && (
-                <button {...{ [eventName]: hideButton }} type="button" />
-              )}
-            </div>
-          </ClickAwayListener>
+      it("should not call outer prop.onClickAway when clicking in between", async () => {
+        const handleOuterClickAway = jest.fn();
+        const handleInnerClickAway = jest.fn();
+        const handleWrapperClick = jest.fn();
+        await render(
+          <>
+            <ClickAwayListener onClickAway={handleOuterClickAway}>
+              <div onClick={handleWrapperClick}>
+                <button>Between</button>
+                <ClickAwayListener onClickAway={handleInnerClickAway}>
+                  <div>
+                    <button>Inside</button>
+                  </div>
+                </ClickAwayListener>
+              </div>
+            </ClickAwayListener>
+            <button>Outside</button>
+          </>
         );
-      }
-      await render(<Test />);
-      await userEvent.click(screen.getByRole("button"));
+        await userEvent.click(screen.getByText("Inside"));
+        expect(handleOuterClickAway).toHaveBeenCalledTimes(0);
+        expect(handleInnerClickAway).toHaveBeenCalledTimes(0);
+        expect(handleWrapperClick).toHaveBeenCalledTimes(1);
 
-      expect(handleClickAway).toHaveBeenCalledTimes(0);
-    });
-  });
+        await userEvent.click(screen.getByText("Between"));
+        expect(handleOuterClickAway).toHaveBeenCalledTimes(0);
+        expect(handleInnerClickAway).toHaveBeenCalledTimes(1);
+        expect(handleWrapperClick).toHaveBeenCalledTimes(2);
 
-  describe("nesting", () => {
-    it("should call all prop.onClickAway handlers when clicking outside of both elements", async () => {
-      const handleOuterClickAway = jest.fn();
-      const handleInnerClickAway = jest.fn();
-      await render(
-        <>
-          <ClickAwayListener onClickAway={handleOuterClickAway}>
-            <div>
-              <ClickAwayListener onClickAway={handleInnerClickAway}>
-                <div />
-              </ClickAwayListener>
-            </div>
-          </ClickAwayListener>
-          <button>Outside</button>
-        </>
-      );
-      await userEvent.click(screen.getByRole("button"));
-      expect(handleOuterClickAway).toHaveBeenCalledTimes(1);
-      expect(handleInnerClickAway).toHaveBeenCalledTimes(1);
-    });
-
-    it("should not call outer prop.onClickAway when clicking in between", async () => {
-      const handleOuterClickAway = jest.fn();
-      const handleInnerClickAway = jest.fn();
-      const handleWrapperClick = jest.fn();
-      await render(
-        <>
-          <ClickAwayListener onClickAway={handleOuterClickAway}>
-            <div onClick={handleWrapperClick}>
-              <button>Between</button>
-              <ClickAwayListener onClickAway={handleInnerClickAway}>
-                <div>
-                  <button>Inside</button>
-                </div>
-              </ClickAwayListener>
-            </div>
-          </ClickAwayListener>
-          <button>Outside</button>
-        </>
-      );
-      await userEvent.click(screen.getByText("Inside"));
-      expect(handleOuterClickAway).toHaveBeenCalledTimes(0);
-      expect(handleInnerClickAway).toHaveBeenCalledTimes(0);
-      expect(handleWrapperClick).toHaveBeenCalledTimes(1);
-
-      await userEvent.click(screen.getByText("Between"));
-      expect(handleOuterClickAway).toHaveBeenCalledTimes(0);
-      expect(handleInnerClickAway).toHaveBeenCalledTimes(1);
-      expect(handleWrapperClick).toHaveBeenCalledTimes(2);
-
-      await userEvent.click(screen.getByText("Outside"));
-      expect(handleOuterClickAway).toHaveBeenCalledTimes(1);
-      expect(handleInnerClickAway).toHaveBeenCalledTimes(2);
-      expect(handleWrapperClick).toHaveBeenCalledTimes(2);
+        await userEvent.click(screen.getByText("Outside"));
+        expect(handleOuterClickAway).toHaveBeenCalledTimes(1);
+        expect(handleInnerClickAway).toHaveBeenCalledTimes(2);
+        expect(handleWrapperClick).toHaveBeenCalledTimes(2);
+      });
     });
   });
 });

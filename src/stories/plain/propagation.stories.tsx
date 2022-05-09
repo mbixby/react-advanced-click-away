@@ -1,7 +1,7 @@
 import React, { CSSProperties, ReactNode } from "react";
 import ReactDOM from "react-dom";
 import ClickAwayListener from "../../ClickAwayListener";
-import ClickAwayOverlay from "../../ClickAwayOverlay";
+import Layer from "../../Layer";
 import StopPropagation from "../../StopPropagation";
 import { useActions } from "../components/Actions";
 import Block from "../components/Block";
@@ -11,10 +11,20 @@ import {
   orange,
   pink,
   purple,
-  red,
 } from "../components/colors";
 
-export default { title: "Stories/Propagation" };
+export default {
+  title: "Stories/Propagation",
+  decorators: [
+    (Story) => (
+      <Layer root>
+        <div>
+          <Story />
+        </div>
+      </Layer>
+    ),
+  ],
+};
 
 const Portal: React.FC<{ children: ReactNode }> = ({ children }) => {
   return ReactDOM.createPortal(children, document.body);
@@ -61,13 +71,25 @@ export const Scenario1 = () => {
   );
 };
 
-const outsideStyle: CSSProperties = { height: 120, width: 580 };
+const outsideStyle: CSSProperties = {
+  height: 140,
+  width: 450,
+};
 
-const firstLayerStyle: CSSProperties = {
+const purpleBlockStyle: CSSProperties = {
   position: "absolute",
   left: 180,
   top: 40,
   height: (outsideStyle.height as number) - 50,
+  width: 190,
+};
+
+const pinkBlockStyle: CSSProperties = {
+  position: "absolute",
+  left: 320,
+  top: 60,
+  height: (outsideStyle.height as number) - 90,
+  zIndex: 2,
 };
 
 export const Scenario2 = () => {
@@ -83,11 +105,20 @@ export const Scenario2 = () => {
               label="Block"
               color={purple}
               animateClicks
-              style={firstLayerStyle}
+              style={purpleBlockStyle}
             >
               <Portal>
                 <StopPropagation all>
-                  <Block label="Portaled block" color={pink} animateClicks />
+                  <ClickAwayListener
+                    onClickAway={action(`Clicked outside of ${pink} block`)}
+                  >
+                    <Block
+                      label="Portaled block"
+                      color={pink}
+                      animateClicks
+                      style={pinkBlockStyle}
+                    />
+                  </ClickAwayListener>
                 </StopPropagation>
               </Portal>
             </Block>
@@ -99,7 +130,7 @@ export const Scenario2 = () => {
 };
 
 Scenario2.parameters = {
-  docs: { inlineStories: false, iframeHeight: 280 },
+  docs: { inlineStories: false, iframeHeight: 230 },
 };
 
 export const Scenario3 = () => {
@@ -109,10 +140,15 @@ export const Scenario3 = () => {
       <ClickAwayListener
         onClickAway={action(`Clicked outside of ${orange} block`)}
       >
-        <Block label="Underneath" color={orange} animateClicks />
+        <Block
+          label="Underneath"
+          color={orange}
+          animateClicks
+          invertArrowColor
+        />
       </ClickAwayListener>
 
-      <ClickAwayOverlay>
+      <Layer>
         <StopPropagation all>
           <Block label="Overlay" color={blueTransparent} style={{ left: -80 }}>
             <ClickAwayListener
@@ -123,11 +159,12 @@ export const Scenario3 = () => {
                 color={purple}
                 animateClicks
                 style={{ marginLeft: 120 }}
+                invertArrowColor
               />
             </ClickAwayListener>
           </Block>
         </StopPropagation>
-      </ClickAwayOverlay>
+      </Layer>
     </>
   );
 };
@@ -141,29 +178,14 @@ export const Scenario4 = () => {
   const { action } = useActions();
   return (
     <>
-      <Block label="Outside" color={blue}>
-        <ClickAwayListener
-          onClickAway={action(`Clicked outside of ${orange} block`)}
-        >
-          <Block label="Inside" color={orange} animateClicks />
-        </ClickAwayListener>
-
-        <ClickAwayListener
-          useCapture
-          onClickAway={action(`Clicked outside of ${red} block`)}
-        >
-          <Block label="Inside" color={red} animateClicks />
-        </ClickAwayListener>
-      </Block>
-
-      <div style={{ marginTop: 24 }}>
+      <div style={{ marginBottom: 24 }}>
         <button
           onClick={(event) => {
             event.stopPropagation();
           }}
           style={buttonStyle4}
         >
-          Slightly restrictive button
+          Button calling <code>stopPropagation</code>
         </button>
 
         <button
@@ -173,9 +195,17 @@ export const Scenario4 = () => {
           }}
           style={buttonStyle4}
         >
-          Very restrictive button
+          Button calling <code>stopImmediatePropagation</code>
         </button>
       </div>
+
+      <Block label="Outside" color={blue}>
+        <ClickAwayListener
+          onClickAway={action(`Clicked outside of ${orange} block`)}
+        >
+          <Block label="Block" color={orange} animateClicks />
+        </ClickAwayListener>
+      </Block>
     </>
   );
 };

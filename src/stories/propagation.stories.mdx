@@ -10,13 +10,13 @@ import ClickAwayListener from "../ClickAwayListener";
 
 To determine whether an element is inside `ClickAwayListener`, we ask whether its either inside its DOM tree or the React tree. To check the React tree, we attach another mouse up event handler to `ClickAwayListener`'s child element (in addition to the `document` event listener). When a synthetic React event is captured, we'll ignore the next event coming from the `document` listener, so that `onClickAway()` is not called.
 
-This method works fine for basic use cases, but sometimes we want to stop event propagation from inside `ClickAwayListener`'s React tree without affecting the click away behaviour. This library does this by using React Context and providing some extra methods to side-step React's eventing.
+This method works fine for basic use cases, but often we want to stop event propagation from inside `ClickAwayListener`'s React tree without affecting the click away behaviour. To do this we listen to events in their capture phase.
 
-Conceptually, we would like the `ClickAwayListener` to work regardless of the context it appears in. This library aims to work _as if_ browsers provided a native 'click outside' event. For example, we could write something like `element.addEventListener('clickoutside')`, which wouldn't be affected if an unrelated element on the page called `event.stopPropagation()`.
+Conceptually, we would like the `ClickAwayListener` to work regardless of the context it appears in. This library aims to work _as if_ browsers provided a native 'click outside' event. For example, we could write `element.addEventListener('clickoutside')`, which wouldn't be affected if an unrelated element on the page called `event.stopPropagation()`.
 
 ## Stopping propagation through DOM tree
 
-Stopping event propagation should not affect the click away listener. The buttons in this example call both `event.stopPropagation()` and `event.nativeEvent.stopImmediatePropagation()` however clicking it will still trigger the `onClickAway` callback.
+Stopping event propagation in the bubble phase will not affect the click away listener. The buttons in this example call both `event.stopPropagation()` and `event.nativeEvent.stopImmediatePropagation()` inside onMouseUp (and similar) handlers however clicking outside will still trigger the `onClickAway` callback.
 
 <StoryAndSource id="stories-propagation--scenario-1" />
 
@@ -24,23 +24,20 @@ Stopping event propagation should not affect the click away listener. The button
 
 React events bubble through React portals by default, however this behaviour [is often not desired](https://github.com/facebook/react/issues/11387), depending on the UI. For example, a full screen modal can be thought of as a visual overlay in the app. If we were to hover over an element inside the modal, we most likely don't want the hover events to bubble up to any elements outside of that modal (outside or underneath the overlay).
 
-However, if we stop propagation of mouse and keyboard events from such UI elements, the `ClickAwayListener` will have no way of finding out whether the `event.target` is inside its React tree. To work around this, we expose a method via `ClickAwayContext` that can be optionally called when stopping event propagation.
+However, if we stop propagation of mouse and keyboard events from such UI elements, the `ClickAwayListener` will have no way of finding out whether the `event.target` is inside its React tree. To work around this, we use the capture phase of the native document event to determine that an event occured, and bubble phase of synthetic React events to inform the component about its React tree.
 
 <StoryAndSource id="stories-propagation--scenario-2" />
 
 Where the `<StopPropagation>` component is implemented roughly like this:
 
-```tsx
+```js
 export const StopPropagation = () => {
-  const clickAwayContext = useContext(ClickAwayContext);
-
   const handleEvent = useCallback(
     (event: React.MouseEvent) => {
       event.stopPropagation();
       event.nativeEvent.stopImmediatePropagation();
-      clickAwayContext?.propagateEvent(event);
     },
-    [clickAwayContext]
+    []
   );
 
   return cloneElement(children, {
@@ -51,9 +48,11 @@ export const StopPropagation = () => {
 };
 ```
 
-<StoryAndSource id="stories-propagation--scenario-3" />
-
 ## Establishing an overlay
+
+In this example, clicks inside the overlay do not affect click away listeners that exist underneath of the overlay.
+
+<StoryAndSource id="stories-propagation--scenario-3" />
 
 ### Related issues
 
@@ -65,10 +64,9 @@ export const StopPropagation = () => {
 - https://github.com/mui/material-ui/issues/17636
 - https://github.com/mui/material-ui/pull/23315
 
-## Capture phase method
+## Stopping immediate propagation
 
-When an element on a page stops propagation of mouse events to the document element, the `ClickAwayListener` has no way to register the click. In this case, setting the `useCapture` can be used as an escape hatch.
-
-In the following example, the red block uses `<ClickAwayListener useCapture>`, whereas the orange block doesn't.
+Buttons calling `stopPropagation()` or `stopImmediatePropagation` have no effect on the
+ClickAwayListener, unless they stop the capture phase.
 
 <StoryAndSource id="stories-propagation--scenario-4" />

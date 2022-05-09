@@ -5,12 +5,7 @@ import { useActions } from "../components/Actions";
 import Block from "../components/Block";
 import { blue, orange, pink, purple, red } from "../components/colors";
 
-export default {
-  title: "Stories/Nesting",
-  parameters: {
-    docs: { inlineStories: false, iframeHeight: 320 },
-  },
-};
+export default { title: "Stories/Nesting" };
 
 const Portal: React.FC<{ children: ReactNode }> = ({ children }) => {
   return ReactDOM.createPortal(children, document.body);
@@ -89,4 +84,8 @@ export const Scenario2 = () => {
       </Block>
     </>
   );
+};
+
+Scenario2.parameters = {
+  docs: { inlineStories: false, iframeHeight: 320 },
 };

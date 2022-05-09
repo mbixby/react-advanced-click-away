@@ -8,21 +8,25 @@ import React, {
   useEffect,
   useRef,
 } from "react";
+import { LayerContext } from "./layerContext";
 import { useForkRef } from "./utils/useForkRef";
-import useObjectMemo from "./utils/useObjectMemo";
 import useRefCallback from "./utils/useRefCallback";
-import { ClickAwayContext } from "./context";
 
-// Used in development. Set to true to log click away actions.
+// Set to true to log click away actions.
 const debug = false;
+// Name of a child prop to label debug messages.
+const debugLabelProp = "label";
 
 const compact = <T extends unknown>(array: T[]): T[] =>
   array.filter((x) => !!x);
 
-const log = (level: number, ...args: any[]) => {
+const log = (label: string | undefined, ...args: any[]) => {
   if (debug) {
     // eslint-disable-next-line no-console
-    console.log(`ClickAwayListener (level ${level}): `, ...args);
+    console.log(
+      compact(["ClickAwayListener", label && ` (${label})`, ":"]).join(""),
+      ...args
+    );
   }
 };
 
@@ -33,52 +37,60 @@ function clickedRootScrollbar(event: MouseEvent, doc: Document) {
   );
 }
 
-type ClickAwayMouseEventHandler = "onClick" | "onMouseDown" | "onMouseUp";
-type ClickAwayTouchEventHandler = "onTouchStart" | "onTouchEnd";
-type HandleClickAway<T extends Event> = (event: T) => void;
+const mouseEventMap = {
+  click: "onClick" as "onClick",
+  mouseup: "onMouseUp" as "onMouseUp",
+  mousedown: "onMouseDown" as "onMouseDown",
+};
 
-function mapEventPropToEvent(
-  eventProp: ClickAwayMouseEventHandler | ClickAwayTouchEventHandler
-): "click" | "mousedown" | "mouseup" | "touchstart" | "touchend" {
-  return eventProp.substring(2).toLowerCase() as any;
-}
+const touchEventMap = {
+  touchstart: "onTouchStart" as "onTouchStart",
+  touchend: "onTouchEnd" as "onTouchEnd",
+};
+
+const eventPhaseLabel: { [key in number]: string } = {
+  0: "no phase",
+  1: "capture phase",
+  2: "at target",
+  3: "bubble phase",
+};
+
+const getEventLabel = (event: Event | SyntheticEvent) =>
+  `${event.type} event (${eventPhaseLabel[event.eventPhase]})`;
+
+type ClickAwayMouseEvent = keyof typeof mouseEventMap;
+type ClickAwayTouchEvent = keyof typeof touchEventMap;
+type ReactEventHandlers =
+  | typeof mouseEventMap[ClickAwayMouseEvent]
+  | typeof touchEventMap[ClickAwayTouchEvent];
+type HandleClickAway<T extends Event> = (event: T) => void;
 
 export interface Props {
   /**
-   * Handler called on click away
+   * Handler called on click away.
    */
   onClickAway: (event: MouseEvent | TouchEvent) => void;
   /**
-   * This must be a ref-accepting child
+   * This must be a ref-accepting child.
    */
   children: ReactElement;
   /**
-   * Clickaway event to listen to
+   * Clickaway event to listen to.
    * @default 'onMouseUp'
    */
-  mouseEvent?: ClickAwayMouseEventHandler | false;
+  mouseEvent?: ClickAwayMouseEvent | false;
   /**
-   * Clickaway event to listen to
+   * Clickaway event to listen to.
    * @default 'onTouchEnd'
    */
-  touchEvent?: ClickAwayTouchEventHandler | false;
+  touchEvent?: ClickAwayTouchEvent | false;
   /**
-   * If `true`, the React tree is ignored and only the DOM tree is considered. This means that elements inside React portal will be considered to be outside of the `<ClickAwayListener>`.
+   * If `true`, the React tree is ignored and only the DOM tree is considered. This means
+   * that elements inside React portal will be considered to be outside of the
+   * `<ClickAwayListener>`.
    * @default false
    */
   disableReactTree?: boolean;
-  /**
-   * Typically, ClickAwayListener requires mouse events (mouseup by default) to be
-   * propagated all the way up to the document. If an element on a page stops propagation
-   * of the event, clicking on that element will not trigger the onClickAway() handler.
-   *
-   * Event bubbling is useful here to determine whether the event comes from inside the
-   * DOM or React tree and therefore it is the default behaviour.
-   *
-   * When this behaviour is not desired, this option can be set to true and the capture
-   * phase of the clickaway event will trigger the onClickAway() handler instead.
-   */
-  useCapture?: boolean;
   /**
    * If true, clicking the window scrollbars will not trigger the `onClickAway()` handler.
    */
@@ -87,7 +99,7 @@ export interface Props {
    * Root element, `document` by default. Clicking outside of this element will not
    * trigger the `onClickAway()` handler.
    */
-  owner?: HTMLElement;
+  layer?: HTMLElement;
 }
 
 /**
@@ -96,25 +108,27 @@ export interface Props {
  * your page.
  */
 const ClickAwayListener: React.FC<Props> = ({
-  children,
+  children: child,
   disableReactTree = false,
-  mouseEvent = "onMouseUp",
+  mouseEvent = "mousedown",
   onClickAway,
-  touchEvent = "onTouchEnd",
-  useCapture = false,
+  touchEvent = "touchstart",
   ignoreScrollbars = false,
-  owner: ownerProp,
+  layer: layerProp,
 }) => {
   const movedRef = useRef(false);
   const nodeRef = useRef<Element>(null);
   const activatedRef = useRef(false);
   const syntheticEventRef = useRef(false);
-  const context = useContext(ClickAwayContext);
-  const level = context.level + 1;
+  const capturePhase = useRef(false);
+  const mouseEventHandler = mouseEvent ? mouseEventMap[mouseEvent] : mouseEvent;
+  const touchEventHandler = touchEvent ? touchEventMap[touchEvent] : touchEvent;
+  const label = child?.props?.[debugLabelProp]; // for debugging
   const ownerDocument = nodeRef.current?.ownerDocument ?? document;
-  const ownerElement =
-    ownerProp ?? context.owner.current ?? ownerDocument.documentElement;
-  const targetElement = ownerProp ?? context.owner.current ?? ownerDocument;
+  const context = useContext(LayerContext);
+  const { isDisabled } = context;
+  const layerElement =
+    layerProp ?? context.ownLayer.current ?? ownerDocument.documentElement;
 
   useEffect(() => {
     // Ensure that this component is not "activated" synchronously.
@@ -129,7 +143,7 @@ const ClickAwayListener: React.FC<Props> = ({
 
   const handleRef = useForkRef(
     // @ts-expect-error
-    children.ref,
+    child.ref,
     nodeRef
   );
 
@@ -141,12 +155,20 @@ const ClickAwayListener: React.FC<Props> = ({
   // Only special HTML elements have these default behaviors.
   const handleClickAway = useRefCallback(
     (event: MouseEvent | TouchEvent) => {
-      log(level, `handling ${event.type} event from document`, event);
+      if (isDisabled) {
+        return;
+      }
+
+      log(label, `handling ${getEventLabel(event)} from document`, {
+        event,
+        nodeRef,
+      });
 
       // Given developers can stop the propagation of the synthetic event,
       // we can only be confident with a positive value.
       const insideReactTree = syntheticEventRef.current;
       syntheticEventRef.current = false;
+      capturePhase.current = false;
 
       const didClickScrollbar =
         !ignoreScrollbars &&
@@ -173,7 +195,7 @@ const ClickAwayListener: React.FC<Props> = ({
         insideDOM = event.composedPath().indexOf(nodeRef.current) > -1;
       } else {
         insideDOM =
-          !ownerElement.contains(
+          !layerElement.contains(
             // @ts-expect-error
             event.target
           ) ||
@@ -187,121 +209,108 @@ const ClickAwayListener: React.FC<Props> = ({
 
       if (isClickAway) {
         const reason = "the target is not DOM tree or React tree descendant";
-        log(level, `onClickAway() is called because ${reason}`);
+        log(label, `onClickAway() is called because ${reason}`);
       } else {
         const reasons = compact([
-          insideDOM && "DOM tree descendant",
-          !disableReactTree && insideReactTree && "React tree descendant",
+          insideDOM && "a DOM tree descendant",
+          !disableReactTree && insideReactTree && "a React tree descendant",
         ]);
-        const reason = `event target is ${reasons.join(" and ")}`;
-        log(level, `onClickAway() is not called because ${reason}`);
+        const reason = `the event target is ${reasons.join(" and ")}`;
+        log(label, `onClickAway() is not called because ${reason}`);
       }
 
       if (isClickAway) {
         onClickAway(event);
       }
     },
-    [onClickAway, disableReactTree, level, ownerDocument, ownerElement]
+    [onClickAway, disableReactTree, ownerDocument, layerElement, isDisabled]
   );
 
-  if (context.useCapture && !useCapture) {
-    // eslint-disable-next-line
-    console.error(
-      "Nesting of ClickAwayListener components is not supported if the parent has the useCapture prop set to true."
-    );
-  }
-
-  const propagateEvent = useRefCallback(
-    (event: SyntheticEvent) => {
-      if (mouseEvent && event.type === mapEventPropToEvent(mouseEvent)) {
-        syntheticEventRef.current = true;
+  const handleCapturePhaseClickAway = useRefCallback(
+    (event: MouseEvent | TouchEvent) => {
+      if (isDisabled) {
+        return;
       }
-      log(level, `received event ${event.type} from downstream`);
-      context.propagateEvent(event);
+
+      log(label, `handling ${getEventLabel(event)} from document`, {
+        event,
+        nodeRef,
+      });
+
+      capturePhase.current = true;
+
+      // Schedule the click-away handler as a fallback case for when the event doesn't
+      // bubble up.
+      setTimeout(() => {
+        if (capturePhase.current) {
+          handleClickAway(event);
+        }
+      });
     },
-    [context, mouseEvent, level]
+    [isDisabled, handleClickAway]
   );
 
   // Keep track of mouse/touch events that bubbled up through the portal.
   const createHandleSynthetic =
     (handlerName: string) => (event: SyntheticEvent) => {
-      log(level, `handling ${event.type} event from React descendant`, event);
+      log(label, `handling ${getEventLabel(event)} from React descendant`, {
+        event,
+      });
 
       syntheticEventRef.current = true;
 
-      const childrenPropsHandler = children.props[handlerName];
+      const childrenPropsHandler = child?.props?.[handlerName];
       childrenPropsHandler?.(event);
-
-      // Inform parent ClickAwayListeners about events coming from inside the React
-      // tree. We'll propagate the event solely to the ClickAwayListener elements
-      // via React context.
-      context.propagateEvent(event);
     };
 
   const childrenProps: { ref: Ref<Element> } & Pick<
     DOMAttributes<Element>,
-    ClickAwayMouseEventHandler | ClickAwayTouchEventHandler
+    ReactEventHandlers
   > = { ref: handleRef };
 
-  if (touchEvent !== false) {
-    childrenProps[touchEvent] = createHandleSynthetic(touchEvent);
+  if (touchEventHandler !== false) {
+    childrenProps[touchEventHandler] = createHandleSynthetic(touchEventHandler);
   }
 
   useEffect(() => {
     if (touchEvent !== false) {
-      const mappedTouchEvent = mapEventPropToEvent(touchEvent);
       const handleTouchMove = () => {
         movedRef.current = true;
       };
-      targetElement.addEventListener(
-        mappedTouchEvent,
-        handleClickAway as HandleClickAway<Event>,
-        useCapture
+      document.addEventListener(
+        touchEvent,
+        handleClickAway as HandleClickAway<Event>
       );
-      targetElement.addEventListener("touchmove", handleTouchMove, useCapture);
+      document.addEventListener("touchmove", handleTouchMove);
       return () => {
-        targetElement.removeEventListener(
-          mappedTouchEvent,
+        document.removeEventListener(
+          touchEvent,
           handleClickAway as HandleClickAway<Event>
         );
-        targetElement.removeEventListener("touchmove", handleTouchMove);
+        document.removeEventListener("touchmove", handleTouchMove);
       };
     }
-  }, [handleClickAway, touchEvent, useCapture, targetElement]);
+  }, [handleClickAway, touchEvent]);
 
-  if (mouseEvent !== false) {
-    childrenProps[mouseEvent] = createHandleSynthetic(mouseEvent);
+  if (mouseEventHandler !== false) {
+    childrenProps[mouseEventHandler] = createHandleSynthetic(mouseEventHandler);
   }
 
   useEffect(() => {
     if (mouseEvent) {
-      const mappedMouseEvent = mapEventPropToEvent(mouseEvent);
-      targetElement.addEventListener(
-        mappedMouseEvent,
-        handleClickAway as HandleClickAway<Event>,
-        useCapture
-      );
+      const handler = handleClickAway as HandleClickAway<Event>;
+      const captureHandler =
+        handleCapturePhaseClickAway as HandleClickAway<Event>;
+      document.addEventListener(mouseEvent, handler);
+      document.addEventListener(mouseEvent, captureHandler, true);
       return () => {
-        targetElement.removeEventListener(
-          mappedMouseEvent,
-          handleClickAway as HandleClickAway<Event>
-        );
+        document.removeEventListener(mouseEvent, handler);
+        document.removeEventListener(mouseEvent, captureHandler);
       };
     }
-  }, [handleClickAway, mouseEvent, useCapture, targetElement]);
+  }, [handleClickAway, handleCapturePhaseClickAway, mouseEvent]);
 
-  const newContextValue = useObjectMemo({
-    ...context,
-    propagateEvent,
-    useCapture,
-    level,
-  });
-
-  return (
-    <ClickAwayContext.Provider value={newContextValue}>
-      {cloneElement(children, childrenProps)}
-    </ClickAwayContext.Provider>
-  );
+  return cloneElement(child, childrenProps);
 };
 
 export default ClickAwayListener;

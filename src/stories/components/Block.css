@@ -4,7 +4,7 @@
   padding: 24px 32px;
   position: relative;
   user-select: none;
-  cursor: default;
+  cursor: pointer;
   min-width: 80px;
   text-align: center;
   font-size: 18px;
@@ -37,6 +37,12 @@
   top: 0;
   left: 0;
   pointer-events: none;
+}
+.arrows.light {
+  color: white;
+}
+.arrows.dark {
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .arrow {
