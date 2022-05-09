@@ -74,7 +74,7 @@ const StopPropagation = forwardRef<HTMLElement, Props>(
         event.stopPropagation();
 
         if (!excludeNativeEvents) {
-          event.nativeEvent.stopImmediatePropagation();
+          event.nativeEvent?.stopImmediatePropagation?.();
         }
       },
       [excludeNativeEvents]
