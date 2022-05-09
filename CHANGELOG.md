@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.3](https://github.com/mbixby/react-advanced-click-away/compare/v2.1.2...v2.1.3) (2022-05-09)
+
+
+### Bug Fixes
+
+* allow an undefined native event when stopping event propagation ([a5a62a8](https://github.com/mbixby/react-advanced-click-away/commit/a5a62a889eb1d44b5cb8bee5ab8357512ad97d46))
+
 ### [2.1.2](https://github.com/mbixby/react-advanced-click-away/compare/v2.1.1...v2.1.2) (2022-05-09)
 
 
