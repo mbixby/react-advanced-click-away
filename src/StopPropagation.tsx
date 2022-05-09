@@ -1,11 +1,10 @@
 import React, {
   cloneElement,
+  forwardRef,
   ReactElement,
   useCallback,
-  useContext,
 } from "react";
-import { ClickAwayContext } from "./context";
-import { clickAwayEventNames, eventNames } from "./utils/eventNames";
+import { eventNames } from "./utils/eventNames";
 import useCombinedHandler from "./utils/useCombinedHandler";
 import useForkRef from "./utils/useForkRef";
 
@@ -46,24 +45,16 @@ export interface Props {
    * Don't call `nativeEvent.stopImmediatePropagation()`
    */
   excludeNativeEvents?: boolean;
-  /**
-   * Set to true to propagate click away events
-   */
-  excludeClickaway?: boolean;
 }
 
-const StopPropagation = React.forwardRef<HTMLElement, Props>(
+/**
+ * Stops event bubbling to the parent element.
+ *
+ * Capture phase will stay unaffected.
+ */
+const StopPropagation = forwardRef<HTMLElement, Props>(
   (
-    {
-      children,
-      all,
-      mouse,
-      touch,
-      drag,
-      keyboard,
-      excludeNativeEvents,
-      excludeClickaway,
-    },
+    { children, all, mouse, touch, drag, keyboard, excludeNativeEvents },
     parentRef
   ) => {
     const hasSpecifier = [all, mouse, touch, drag, keyboard].some(
@@ -72,7 +63,6 @@ const StopPropagation = React.forwardRef<HTMLElement, Props>(
     if (!hasSpecifier) {
       throw new Error("At least one <StopPropagation> prop must be a boolean.");
     }
-    const clickAwayContext = useContext(ClickAwayContext);
     const combinedRef = useForkRef(
       // @ts-expect-error
       children.ref,
@@ -90,33 +80,16 @@ const StopPropagation = React.forwardRef<HTMLElement, Props>(
       [excludeNativeEvents]
     );
 
-    const handleClickAwayEvent = useCallback(
-      (event: React.MouseEvent) => {
-        handleEvent(event);
-        if (excludeClickaway) {
-          // See comments for ClickAwayContext. This event will propagate to
-          // document node and thus will be handled by <ClickAwayListener>. However
-          // before that point, we'll have informed the parent that the event is
-          // coming from inside its React tree descendant (this component).
-          clickAwayContext?.propagateEvent(event);
-        }
-      },
-      [clickAwayContext, excludeClickaway, handleEvent]
-    );
-
     const handlers = fromPairs(
       Object.keys(eventNames).map((kind) => {
         const group = eventNames[kind as keyof typeof eventNames].map(
           (eventName) => {
-            const ownHandler = clickAwayEventNames.includes(eventName)
-              ? handleClickAwayEvent
-              : handleEvent;
             // This hook will be always invoked the same amount of times and in the same
             // order.
             // eslint-disable-next-line react-hooks/rules-of-hooks
             const combinedHandler = useCombinedHandler(
               children.props[eventName],
-              ownHandler
+              handleEvent
             );
             return [eventName, combinedHandler];
           }
