@@ -1,7 +1,7 @@
 import { invert, mapValues } from "lodash";
 import mappedReplace from "mapped-replace";
 import React, { useCallback, useState } from "react";
-import constate from "../../utils/constate";
+import constate from "../../src/utils/constate";
 import * as colors from "./colors";
 
 const [ActionProvider, useActions] = constate(() => {

@@ -1,8 +1,8 @@
 import React, { CSSProperties, ReactNode } from "react";
 import ReactDOM from "react-dom";
-import ClickAwayListener from "../../ClickAwayListener";
-import Layer from "../../Layer";
-import StopPropagation from "../../StopPropagation";
+import ClickAwayListener from "../../src/ClickAwayListener";
+import Layer from "../../src/Layer";
+import StopPropagation from "../../src/StopPropagation";
 import { useActions } from "../components/Actions";
 import Block from "../components/Block";
 import {

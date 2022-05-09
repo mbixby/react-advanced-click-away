@@ -1,7 +1,7 @@
-import prettier from "prettier/standalone";
-import prettierBabel from "prettier/parser-babel";
 import { themes } from "@storybook/theming";
-import { ActionProvider } from "../src/stories/components/Actions";
+import prettierBabel from "prettier/parser-babel";
+import prettier from "prettier/standalone";
+import { ActionProvider } from "../stories/components/Actions";
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },

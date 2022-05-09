@@ -6,7 +6,7 @@ import {
 import userEvent from "@testing-library/user-event";
 import React, { forwardRef, useRef } from "react";
 import ReactDOM from "react-dom";
-import ClickAwayListener from "./ClickAwayListener";
+import ClickAwayListener from "../src/ClickAwayListener";
 
 const render = async (element: React.ReactElement) => {
   const result = await originalRender(element);

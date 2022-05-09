@@ -10,10 +10,10 @@
     "build": "rollup -c",
     "test": "jest",
     "test:coverage": "npm run test -- --coverage",
-    "lint": "eslint src --ext .ts,.tsx,.js,.jsx --cache --max-warnings 0",
+    "lint": "eslint src test stories --ext .ts,.tsx,.js,.jsx --cache --max-warnings 0",
     "cleanup": "npx rimraf dist storybook-static",
     "release": "standard-version",
-    "prettier": "prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
+    "prettier": "prettier --write '{src,test,stories}/**/*.{js,jsx,ts,tsx}'",
     "storybook": "start-storybook -p 6006",
     "build:storybook": "npm run cleanup; NODE_ENV=production build-storybook"
   },

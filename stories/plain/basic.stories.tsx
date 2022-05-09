@@ -1,5 +1,5 @@
 import React from "react";
-import ClickAwayListener from "../../ClickAwayListener";
+import ClickAwayListener from "../../src/ClickAwayListener";
 import { ActionLog, useActions } from "../components/Actions";
 import Block from "../components/Block";
 import { blue, blueDark } from "../components/colors";

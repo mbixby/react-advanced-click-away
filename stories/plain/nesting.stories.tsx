@@ -1,6 +1,6 @@
 import React, { CSSProperties, ReactNode } from "react";
 import ReactDOM from "react-dom";
-import ClickAwayListener from "../../ClickAwayListener";
+import ClickAwayListener from "../../src/ClickAwayListener";
 import { useActions } from "../components/Actions";
 import Block from "../components/Block";
 import { blue, orange, pink, purple, red } from "../components/colors";
