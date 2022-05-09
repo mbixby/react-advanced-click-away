@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/mbixby/react-advanced-click-away/compare/v2.0.0...v2.1.0) (2022-05-09)
+
+
+### Features
+
+* make layer context optional ([e21e9b8](https://github.com/mbixby/react-advanced-click-away/commit/e21e9b8e2e59a7572be526141ec37c1861509383))
+
 ## [2.0.0](https://github.com/mbixby/react-advanced-click-away/compare/v1.0.1...v2.0.0) (2022-05-09)
 
 
