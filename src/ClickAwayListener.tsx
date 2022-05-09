@@ -188,22 +188,15 @@ const ClickAwayListener: React.FC<Props> = ({
         return;
       }
 
-      let insideDOM;
-
-      // If not enough, can use https://github.com/DieterHolvoet/event-propagation-path/blob/master/propagationPath.js
-      if (event.composedPath) {
-        insideDOM = event.composedPath().indexOf(nodeRef.current) > -1;
-      } else {
-        insideDOM =
-          !layerElement.contains(
-            // @ts-expect-error
-            event.target
-          ) ||
-          nodeRef.current.contains(
-            // @ts-expect-error
-            event.target
-          );
-      }
+      const insideDOM =
+        !layerElement.contains(
+          // @ts-expect-error
+          event.target
+        ) ||
+        nodeRef.current.contains(
+          // @ts-expect-error
+          event.target
+        );
 
       const isClickAway = !insideDOM && (disableReactTree || !insideReactTree);
 
