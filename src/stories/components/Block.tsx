@@ -64,11 +64,11 @@ const Block = forwardRef<
       <div
         {...rest}
         className="block"
-        onClick={(event) => {
+        onMouseDown={(event) => {
           if (animateClicks) {
             setInsideClickCount((prev) => prev + 1);
           }
-          rest.onClick?.(event);
+          rest.onMouseDown?.(event);
           event.stopPropagation();
         }}
         ref={ref}

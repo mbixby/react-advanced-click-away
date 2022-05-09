@@ -71,6 +71,7 @@ const StopPropagation = forwardRef<HTMLElement, Props>(
 
     const handleEvent = useCallback(
       (event: React.MouseEvent) => {
+        console.log("stopping", event.type);
         event.stopPropagation();
 
         if (!excludeNativeEvents) {

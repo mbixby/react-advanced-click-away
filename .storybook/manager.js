@@ -8,4 +8,12 @@ addons.setConfig({
     brandUrl: "https://example.com",
     brandImage: undefined,
   }),
+  isFullscreen: false,
+  showNav: true,
+  showPanel: false,
+  isToolshown: false,
+  sidebar: {
+    showRoots: true,
+    collapsedRoots: ["stories"],
+  },
 });

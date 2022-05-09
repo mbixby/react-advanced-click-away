@@ -38,14 +38,14 @@ function clickedRootScrollbar(event: MouseEvent, doc: Document) {
 }
 
 const mouseEventMap = {
-  click: "onClick" as "onClick",
-  mouseup: "onMouseUp" as "onMouseUp",
-  mousedown: "onMouseDown" as "onMouseDown",
+  click: "onClickCapture" as "onClickCapture",
+  mouseup: "onMouseUpCapture" as "onMouseUpCapture",
+  mousedown: "onMouseDownCapture" as "onMouseDownCapture",
 };
 
 const touchEventMap = {
-  touchstart: "onTouchStart" as "onTouchStart",
-  touchend: "onTouchEnd" as "onTouchEnd",
+  touchstart: "onTouchStartCapture" as "onTouchStartCapture",
+  touchend: "onTouchEndCapture" as "onTouchEndCapture",
 };
 
 const eventPhaseLabel: { [key in number]: string } = {

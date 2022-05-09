@@ -24,19 +24,14 @@ interface Props {
 /**
  * Establish a new layer for click away listeners.
  *
+ * This requires the root app component to be wrapped in `<Layer root>`.
+ *
  * `<ClickAwayListener>` elements outside of the topmost layer will be disabled until the
  * layer is unmounted.
  */
 const Layer = forwardRef<HTMLDivElement, Props>(
   ({ children, root = false }, parentRef) => {
     const parentLayer = useContext(LayerContext);
-    if (
-      !parentLayer?.hasRoot &&
-      !root &&
-      process.env.NODE_ENV !== "production"
-    ) {
-      console.warn("Wrap the app in <Layer root> to use <Layer> components.");
-    }
     const [isDisabled, setDisabled] = useState<boolean>(false);
     const setParentDisabled = parentLayer?.setDisabled;
 
