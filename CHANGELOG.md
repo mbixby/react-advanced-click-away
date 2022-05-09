@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.1](https://github.com/mbixby/react-advanced-click-away/compare/v2.1.0...v2.1.1) (2022-05-09)
+
+
+### Bug Fixes
+
+* revert to original mechanism for propagation through portals ([3061482](https://github.com/mbixby/react-advanced-click-away/commit/306148202e7ccb336db08e21538609a58923d54e))
+
 ## [2.1.0](https://github.com/mbixby/react-advanced-click-away/compare/v2.0.0...v2.1.0) (2022-05-09)
 
 
