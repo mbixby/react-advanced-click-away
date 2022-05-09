@@ -30,10 +30,12 @@ interface Props {
 const Layer = forwardRef<HTMLDivElement, Props>(
   ({ children, root = false }, parentRef) => {
     const parentLayer = useContext(LayerContext);
-    if (!parentLayer?.hasRoot && !root) {
-      throw new Error(
-        "Wrap the app in <Layer root> to use <Layer> components."
-      );
+    if (
+      !parentLayer?.hasRoot &&
+      !root &&
+      process.env.NODE_ENV !== "production"
+    ) {
+      console.warn("Wrap the app in <Layer root> to use <Layer> components.");
     }
     const [isDisabled, setDisabled] = useState<boolean>(false);
     const setParentDisabled = parentLayer?.setDisabled;
