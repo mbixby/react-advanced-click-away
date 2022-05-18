@@ -35,7 +35,7 @@ export default MyComponent;
 
 The original version of this component is adapted from [Material UI's ClickAwayListener](https://mui.com/api/click-away-listener/) and inherits basic features like support for touch events and React portals, as well as [many fixes](https://github.com/mui/material-ui/issues?q=is%3Aissue+is%3Aclosed+clickawaylistener+) for non-obvious issues, like with [handling iframes](https://github.com/mui/material-ui/blob/51289697349/packages/mui-utils/src/ownerDocument.ts) or for [this bug with useEffect timing](https://github.com/mui/material-ui/pull/23315) in React v16. It passes all of Material UI's original unit tests<sup>1</sup>.
 
-This library however aims to support some advanced cases when nesting multiple `<ClickAwayListener>` components, which is useful when building nested popovers, menus and modals. Notably, we listen to events during the capture phase, which often lets us stop mouse event propagation in our React tree without affecting the click away behaviour.
+This library however aims to support some advanced cases when nesting multiple `<ClickAwayListener>` components, which is useful when building nested popovers, menus and modals. Notably, we listen to events during the capture phase, which often lets us stop mouse event propagation elsewhere our React tree without affecting the click away behaviour of unrelated components.
 
 ## [Docs and demos](https://mbixby.github.io/react-advanced-click-away)
 
@@ -47,8 +47,8 @@ Check out the [docs and demos](https://mbixby.github.io/react-advanced-click-awa
 |------------------|-----------------------------------------------------------------------------------------------|---------|---------|
 | onClickAway*     | Handler called on click away                                                                  | (event: MouseEvent &#124; TouchEvent) => void     |
 | children         | A ref-accepting child                                                                         | ReactElement                                      |
-| mouseEvent       | Mouse click away event to listen to                                                           | "click" &#124; "mousedown" &#124; "mouseup" | "mouseup"  |
-| touchEvent       | Touch clickaway event to listen to                                                            | "touchstart" &#124; "touchend"                | "touchend" |
+| mouseEvent       | Mouse click away event to listen to                                                           | "click" &#124; "mousedown" &#124; "mouseup" | "mousedown"  |
+| touchEvent       | Touch click away event to listen to                                                            | "touchstart" &#124; "touchend"                | "touchstart" |
 | disableReactTree | If true, elements inside portals will be considered to be outside of the click away listener. | boolean | false   |
 | ignoreScrollbars | If true, clicking the window scrollbars will not trigger the `onClickAway()` handler.         | boolean | false   |
 | layer            | Root element, `document` by default.                                                          | boolean |        |

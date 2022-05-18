@@ -6,7 +6,7 @@ import ClickAwayListener from "../src/ClickAwayListener";
 
 # Event propagation
 
-`ClickAwayListener` works by attaching a mouse up event listener to the `document`. When an element on a page is clicked, it receives the event and checks whether the `event.target` is inside or outside of `ClickAwayListener`'s contents. If it's outside then we trigger the `onClickAway()` callback.
+`ClickAwayListener` works by attaching a mouse event listener to the `document`. When an element on a page is clicked, it receives the event and checks whether the `event.target` is inside or outside of `ClickAwayListener`'s contents. If it's outside then we trigger the `onClickAway()` callback.
 
 To determine whether an element is inside `ClickAwayListener`, we ask whether its either inside its DOM tree or the React tree. To check the React tree, we attach another mouse up event handler to `ClickAwayListener`'s child element (in addition to the `document` event listener). When a synthetic React event is captured, we'll ignore the next event coming from the `document` listener, so that `onClickAway()` is not called.
 

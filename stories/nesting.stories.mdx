@@ -20,7 +20,7 @@ In the example below we're nesting two layers (two click away listeners).
 
 When `<ClickAwayListener>` elements are nested inside React Portals, they work the same way as if they weren't.
 
-Even though the elements are not nested in DOM, they are nested in the React tree. Internally, we determine that the second layer is "inside" the first layer by checking whether React events propagate from the layer below and by looking at the React Context hiearchy established by the `<ClickAwayListener>` elements.
+Even though the elements are not nested in DOM, they are nested in the React tree. Internally, we determine that the second layer is "inside" the first layer by checking whether React events propagate from the layer below.
 
 This behaviour can be disabled using the `disableReactTree` prop, which means that the listener will only DOM hierarchy will be considered.
 
