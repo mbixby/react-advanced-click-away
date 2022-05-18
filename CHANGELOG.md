@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.6](https://github.com/mbixby/react-advanced-click-away/compare/v2.1.5...v2.1.6) (2022-05-18)
+
+
+### Bug Fixes
+
+* fix touch handler, don't handle synthetic events in disabled state ([04d5c79](https://github.com/mbixby/react-advanced-click-away/commit/04d5c7929ccd9c6c0369ae68866890994b7b3132))
+
 ### [2.1.5](https://github.com/mbixby/react-advanced-click-away/compare/v2.1.4...v2.1.5) (2022-05-11)
 
 
