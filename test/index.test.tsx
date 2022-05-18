@@ -17,8 +17,6 @@ const render = async (element: React.ReactElement) => {
   return result;
 };
 
-const delay = () => new Promise((resolve) => setTimeout(resolve, 10));
-
 const Portal: React.FC<{
   children: React.ReactNode;
   stopEventPropagation?: boolean;
