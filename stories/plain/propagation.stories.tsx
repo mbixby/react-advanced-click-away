@@ -1,7 +1,7 @@
 import React, { CSSProperties, ReactNode } from "react";
 import ReactDOM from "react-dom";
+import ClickAwayLayer from "../../src/ClickAwayLayer";
 import ClickAwayListener from "../../src/ClickAwayListener";
-import Layer from "../../src/Layer";
 import StopPropagation from "../../src/StopPropagation";
 import { useActions } from "../components/Actions";
 import Block from "../components/Block";
@@ -17,11 +17,11 @@ export default {
   title: "Stories/Propagation",
   decorators: [
     (Story) => (
-      <Layer root>
+      <ClickAwayLayer root>
         <div>
           <Story />
         </div>
-      </Layer>
+      </ClickAwayLayer>
     ),
   ],
 };
@@ -148,7 +148,7 @@ export const Scenario3 = () => {
         />
       </ClickAwayListener>
 
-      <Layer>
+      <ClickAwayLayer>
         <StopPropagation all>
           <Block label="Overlay" color={blueTransparent} style={{ left: -80 }}>
             <ClickAwayListener
@@ -164,7 +164,7 @@ export const Scenario3 = () => {
             </ClickAwayListener>
           </Block>
         </StopPropagation>
-      </Layer>
+      </ClickAwayLayer>
     </>
   );
 };
