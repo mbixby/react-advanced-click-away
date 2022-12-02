@@ -14,8 +14,10 @@ type SelectorHooks<Selectors> = {
     : never;
 };
 
-type Hooks<Value, Selectors extends Selector<Value>[]> =
-  Selectors["length"] extends 0 ? [() => Value] : SelectorHooks<Selectors>;
+type Hooks<
+  Value,
+  Selectors extends Selector<Value>[]
+> = Selectors["length"] extends 0 ? [() => Value] : SelectorHooks<Selectors>;
 
 type ConstateTuple<Props, Value, Selectors extends Selector<Value>[]> = [
   React.FC<Props>,
