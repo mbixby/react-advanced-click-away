@@ -29,7 +29,7 @@ interface Props {
  * `<ClickAwayListener>` elements outside of the topmost layer will be disabled until the
  * layer is unmounted.
  */
-const Layer = forwardRef<HTMLDivElement, Props>(
+const ClickAwayLayer = forwardRef<HTMLDivElement, Props>(
   ({ children, root = false }, parentRef) => {
     const parentLayer = useContext(LayerContext);
     const [isDisabled, setDisabled] = useState<boolean>(false);
@@ -69,4 +69,4 @@ const Layer = forwardRef<HTMLDivElement, Props>(
   }
 );
 
-export default Layer;
+export default ClickAwayLayer;

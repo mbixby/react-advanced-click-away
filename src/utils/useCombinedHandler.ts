@@ -8,7 +8,7 @@ const useCombinedHandler = <TEvent>(
   callback2: ((event: TEvent) => void) | undefined
 ): ((event: TEvent) => void) =>
   useCallback(
-    (event: any) => {
+    (event: TEvent) => {
       callback1?.(event);
       callback2?.(event);
     },

@@ -55,7 +55,7 @@ Check out the [docs and demos](https://mbixby.github.io/react-advanced-click-awa
 
 ## Layers
 
-Wrap modal contents in a `<Layer>` to freeze any click away listeners underneath the modal.
+Wrap modal contents in a `<ClickAwayLayer>` to freeze any click away listeners underneath the modal.
 
 If building modals you may also consider [locking scroll](https://github.com/theKashey/react-focus-lock), [locking focus](https://github.com/FL3NKEY/scroll-lock) and in some cases stopping event propagation.
 
@@ -67,9 +67,9 @@ const BaseModal = ({ open, children }) => (
       <ScrollLock>
         <FocusLock>
           <StopPropagation all>
-            <Layer>
+            <ClickAwayLayer>
               <div role="dialog">{children}</div>
-            </Layer>
+            </ClickAwayLayer>
           </StopPropagation>
         </FocusLock>
       </ScrollLock>
@@ -79,15 +79,10 @@ const BaseModal = ({ open, children }) => (
 
 // Don't forget to establish a root layer in the app.
 // This is not needed if you don't use click away layers.
-const App = ({ children }) => <Layer root><Component /></Layer>
+const App = ({ children }) => <ClickAwayLayer root><Component /></Layer>
 ```
 
 See docs for examples of usage.
-
-## Roadmap
-
-- [ ] update docs with examples of nested dropdowns, tooltips and modals
-- [ ] add a method to stop click away event propagation (in addition to `<Layer />`)
 
 ## Attribution
 
