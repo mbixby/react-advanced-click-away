@@ -1,8 +1,7 @@
+import remarkGfm from "remark-gfm";
+
 module.exports = {
-  stories: [
-    "../stories/**/*.stories.mdx",
-    "../stories/**/*.stories.@(js|jsx|ts|tsx)",
-  ],
+  stories: ["../stories/**/*.mdx", "../stories/**/*.stories.@(js|jsx|ts|tsx)"],
   addons: [
     "@storybook/addon-links",
     {
@@ -13,12 +12,8 @@ module.exports = {
       name: "@storybook/addon-essentials",
       options: { docs: false },
     },
-    "@storybook/addon-interactions",
   ],
-  framework: "@storybook/react",
-  core: {
-    builder: "webpack5",
-  },
+  framework: "@storybook/react-vite",
   typescript: {
     check: false,
     checkOptions: {},

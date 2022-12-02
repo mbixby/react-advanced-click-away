@@ -1,6 +1,7 @@
 import { Canvas, Meta, Story } from "@storybook/addon-docs";
-import StoryAndSource from "./components/StoryAndSource";
 import ClickAwayListener from "../src/ClickAwayListener";
+import StoryAndSource from "./components/StoryAndSource";
+import * as PropagationStories from "./plain/propagation.stories";
 
 <Meta title="Event propagation" />
 
@@ -18,7 +19,7 @@ Conceptually, we would like the `ClickAwayListener` to work regardless of the co
 
 Stopping event propagation in the bubble phase will not affect the click away listener. The buttons in this example call both `event.stopPropagation()` and `event.nativeEvent.stopImmediatePropagation()` inside onMouseUp (and similar) handlers however clicking outside will still trigger the `onClickAway` callback.
 
-<StoryAndSource id="stories-propagation--scenario-1" />
+<StoryAndSource of={PropagationStories.Scenario1} id="stories-propagation--scenario-1" />
 
 ## Stopping propagation through React portals
 
@@ -26,7 +27,7 @@ React events bubble through React portals by default, however this behaviour [is
 
 However, if we stop propagation of mouse and keyboard events from such UI elements, the `ClickAwayListener` will have no way of finding out whether the `event.target` is inside its React tree. To work around this, we use the capture phase of the native document event to determine that an event occured, and bubble phase of synthetic React events to inform the component about its React tree.
 
-<StoryAndSource id="stories-propagation--scenario-2" />
+<StoryAndSource of={PropagationStories.Scenario2} id="stories-propagation--scenario-2" />
 
 Where the `<StopPropagation>` component is implemented roughly like this:
 
@@ -52,7 +53,7 @@ export const StopPropagation = () => {
 
 In this example, clicks inside the overlay do not affect click away listeners that exist underneath of the overlay.
 
-<StoryAndSource id="stories-propagation--scenario-3" />
+<StoryAndSource of={PropagationStories.Scenario3} id="stories-propagation--scenario-3" />
 
 ### Related issues
 
@@ -69,4 +70,4 @@ In this example, clicks inside the overlay do not affect click away listeners th
 Buttons calling `stopPropagation()` or `stopImmediatePropagation` have no effect on the
 ClickAwayListener, unless they stop the capture phase.
 
-<StoryAndSource id="stories-propagation--scenario-4" />
+<StoryAndSource of={PropagationStories.Scenario4} id="stories-propagation--scenario-4" />

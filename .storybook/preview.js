@@ -1,7 +1,11 @@
 import { themes } from "@storybook/theming";
 import prettierBabel from "prettier/parser-babel";
 import prettier from "prettier/standalone";
+import React from "react";
 import { ActionProvider } from "../stories/components/Actions";
+
+// window.global = window;
+// window.global = window;
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
@@ -41,9 +45,8 @@ export const parameters = {
 };
 
 export const decorators = [
-  (Story) => (
-    <ActionProvider>
-      <Story />
-    </ActionProvider>
-  ),
+  (Story) =>
+    React.createElement(ActionProvider, {
+      children: React.createElement(Story),
+    }),
 ];

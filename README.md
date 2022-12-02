@@ -88,7 +88,7 @@ See docs for examples of usage.
 
 The original version of this component was adapted from Material UI.
 
-https://github.com/mui-org/material-ui/blob/512896/packages/mui-material/src/ClickAwayListener/ClickAwayListener.tsx
+[https://github.com/mui-org/material-ui/blob/512896/packages/mui-material/src/ClickAwayListener/ClickAwayListener.tsx](https://github.com/mui-org/material-ui/blob/512896/packages/mui-material/src/ClickAwayListener/ClickAwayListener.tsx)
 
 ## License
 

@@ -1,6 +1,7 @@
 import { Meta, ArgsTable } from "@storybook/addon-docs";
-import StoryAndSource from "./components/StoryAndSource";
 import ClickAwayListener from "../src/ClickAwayListener";
+import StoryAndSource from "./components/StoryAndSource";
+import * as BasicStories from "./plain/basic.stories";
 
 <Meta title="Basic usage" />
 
@@ -8,6 +9,6 @@ import ClickAwayListener from "../src/ClickAwayListener";
 
 Clicking outside of the `<ClickAwayListener>` content triggers the `onClickAway` callback.
 
-<StoryAndSource id="stories-basic--scenario-1" />
+<StoryAndSource of={BasicStories.Scenario1} id="stories-basic--scenario-1" />
 
 <ArgsTable of={ClickAwayListener} />
