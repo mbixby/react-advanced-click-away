@@ -3,7 +3,7 @@
 > A worry-free click away listener for advanced use cases.
 
 [![NPM](https://img.shields.io/npm/v/react-advanced-click-away)](https://www.npmjs.com/package/react-advanced-click-away)
-[![CI](https://img.shields.io/github/workflow/status/mbixby/react-advanced-click-away/CI)](https://github.com/mbixby/react-advanced-click-away/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/mbixby/react-advanced-click-away/ci.yml?branch=main)](https://github.com/mbixby/react-advanced-click-away/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/mbixby/react-advanced-click-away.svg)](https://codecov.io/gh/mbixby/react-advanced-click-away/branch/main)
 
 ## Installation
